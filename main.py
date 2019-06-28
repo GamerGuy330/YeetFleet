@@ -6,17 +6,19 @@ from pipe import Pipe
 pygame.init()
 screen_info = pygame.display.Info()
 
-size = (width, height) = (int(screen_info.current_w), (int(screen_info.current_h)))
+size = (width, height) = (int(screen_info.current_w), int(screen_info.current_h))
 screen = pygame.display.set_mode(size)
-
+clock = pygame.time.Clock()
 background = pygame.image.load('background.png')
 background = pygame.transform.scale(background, (width, height))
-
+color = (255, 0, 0)
+screen.fill(color)
 startPos = (width/8, height/2)
 pipes = pygame.sprite.Group()
 player = Bird(startPos)
-gapSize = 200
-loopCount = 0
+gapSize = 500
+loopCount = 40
+gamePlay = True
 
 def lose():
     font = pygame.font.SysFont(None, 70)
@@ -36,7 +38,8 @@ def lose():
 
 def main():
     global loopCount
-    while True:
+    while gamePlay == True:
+        clock.tick(45)
         if loopCount % 90 == 0:
             topPos = random.randint(0, height/2) - 400
             pipes.add(Pipe((width + 100, topPos + gapSize + 800)))
@@ -47,17 +50,20 @@ def main():
             if event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_SPACE:
                     player.speed[1] = -10
-    player.update()
-    pipes.update()
-    gets_hit = pygame.sprite.spritecollide(player, pipes, False) or player.rect.center[1] > height
-    screen.blit(background, [0, 0])
-    pipes.draw(screen)
-    screen.blit(player.image, player.rect)
-    pygame.display.flip()
-    loopCount += 1
+        screen.fill(color)
+        player.update()
+        pipes.update()
+        gets_hit = pygame.sprite.spritecollide(player, pipes, False) or player.rect.center[1] > height
+        screen.blit(background, [0, 0])
+        pipes.draw(screen)
+        screen.blit(player.image, player.rect)
+        pygame.display.flip()
+        loopCount += 1
 
-    if gets_hit:
-        lose()
+        if gets_hit:
+            lose()
 
 if __name__ == '__main__':
+    pygame.mixer.music.load('crabrave.mp3')
+    pygame.mixer.music.play(0)
     main()
